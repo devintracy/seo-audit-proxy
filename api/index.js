@@ -1,4 +1,12 @@
 export default async function handler(req, res) {
+  // Handle CORS preflight
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed. Use POST.' });
   }
@@ -6,7 +14,6 @@ export default async function handler(req, res) {
   try {
     const { url } = req.body;
 
-    // Log incoming request for debugging
     console.log("🔍 Received URL:", url);
 
     const response = await fetch('https://seo-analyzer3.p.rapidapi.com/seo-audit-basic?url=' + encodeURIComponent(url), {
@@ -19,10 +26,7 @@ export default async function handler(req, res) {
 
     const data = await response.json();
 
-    // Log response from API
-    console.log("✅ SEO API Response:", data);
-
-    // CORS headers
+    // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -33,6 +37,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
+
 
 
 
